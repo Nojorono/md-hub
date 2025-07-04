@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: md-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: master123
+      POSTGRES_DB: postgres
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - md-network
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: md-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: master123
+    volumes:
+      - rabbit_data:/var/lib/rabbitmq
+    restart: unless-stopped
+    networks:
+      - md-network
+
+  redis:
+    image: redis:latest
+    container_name: md-redis
+    restart: always
+    command: redis-server --save 20 1 --loglevel warning --requirepass master123
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - md-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: md-backend
+    ports:
+      - "9001:9001"
+    env_file:
+      - ./backend/.env.docker
+    depends_on:
+      postgres:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+      redis:
+        condition: service_started
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:9001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    networks:
+      - md-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: md-frontend
+    ports:
+      - "9000:9000"
+    env_file:
+      - ./frontend/.env.docker
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9000/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    networks:
+      - md-network
+
+networks:
+  md-network:
+    driver: bridge
+
+volumes:
+  pg_data:
+    driver: local
+  rabbit_data:
+    driver: local
+  redis_data:
+    driver: local
