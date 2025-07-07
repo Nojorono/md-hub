@@ -1,158 +1,246 @@
-A production-ready application with Docker containerization, comprehensive security measures, and optimized performance.
+# MD Hub - Management Dashboard
+
+A comprehensive management dashboard system with microservices architecture, featuring a Vue.js frontend and NestJS backend, all containerized with Docker and ready for production deployment.
+
+## 🏗️ Project Overview
+
+MD Hub is a full-stack application consisting of:
+- **Frontend**: Vue.js 2.x SPA with Vuetify Material Design
+- **Backend**: NestJS API with TypeScript
+- **Database**: PostgreSQL with Drizzle ORM
+- **Message Queue**: RabbitMQ for async processing
+- **Cache**: Redis for session storage
+- **Containerization**: Multi-stage Docker builds
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Docker and Docker Compose
+- Git with submodule support
 - Node.js 20+ (for local development)
-- Yarn package manager
+
+### Initial Setup
+
+#### 1. Clone with Submodules (Recommended)
+```bash
+# Clone the entire project with submodules
+git clone --recursive https://github.com/Nojorono/md-hub.git
+cd md-hub
+```
+
+#### 2. Alternative: Clone and Initialize Submodules
+```bash
+# If you already cloned without submodules
+git clone https://github.com/Nojorono/md-hub.git
+cd md-hub
+git submodule update --init --recursive
+```
 
 ### Environment Setup
 
-1. **Copy environment template:**
+#### 1. Backend Environment
 ```bash
+cd backend
 cp env.example .env.docker
-```
-
-2. **Configure your environment variables:**
-```bash
 # Edit .env.docker with your actual values
-nano .env.docker
 ```
 
-### Docker Deployment (Recommended)
-
-#### Start Complete Infrastructure Stack
+#### 2. Frontend Environment
 ```bash
-# From project root (md-b/)
+cd frontend
+cp env.example .env.docker
+# Edit .env.docker with your actual values
+```
+
+### Start Complete Application Stack
+
+```bash
+# From project root (md-hub/)
 docker-compose up --build
 ```
 
-This starts:
-- **Backend API**: http://localhost:9001
+This starts all services:
 - **Frontend**: http://localhost:9000
+- **Backend API**: http://localhost:9001
 - **PostgreSQL**: localhost:5432 (admin/master123)
 - **RabbitMQ**: localhost:5672, Management UI: http://localhost:15672
 - **Redis**: localhost:6379 (password: master123)
 
-### Local Development
+## 📁 Repository Structure
 
-#### Start Core Services
+```
+md-hub/
+├── .gitmodules              # Submodule configuration
+├── docker-compose.yml       # Complete infrastructure stack
+├── README.md               # This file
+├── backend/                # Backend submodule
+│   ├── src/
+│   │   ├── modules/       # Feature modules
+│   │   │   ├── auth/      # Authentication
+│   │   │   ├── user/      # User management
+│   │   │   ├── activity/  # Activity tracking
+│   │   │   ├── absensi/   # Attendance management
+│   │   │   ├── survey/    # Survey functionality
+│   │   │   ├── sio/       # SIO (Special Instructions)
+│   │   │   ├── outlet/    # Outlet management
+│   │   │   ├── regionarea/# Regional area management
+│   │   │   ├── program/   # Program management
+│   │   │   ├── brand/     # Brand management
+│   │   │   ├── callplan/  # Call planning
+│   │   │   ├── batch/     # Batch processing
+│   │   │   ├── comments/  # Comment system
+│   │   │   ├── dashboard/ # Dashboard data
+│   │   │   ├── notifications/ # Notification system
+│   │   │   ├── reimburseBbm/ # Fuel reimbursement
+│   │   │   ├── report/    # Reporting system
+│   │   │   └── roles/     # Role-based access control
+│   │   ├── common/        # Shared utilities
+│   │   ├── config/        # Configuration
+│   │   └── main.ts        # Application entry point
+│   ├── Dockerfile         # Production Docker image
+│   ├── .dockerignore      # Docker build exclusions
+│   ├── env.example        # Environment template
+│   └── README.md          # Backend documentation
+├── frontend/              # Frontend submodule
+│   ├── src/
+│   │   ├── api/          # API service modules
+│   │   ├── components/   # Vue components
+│   │   │   ├── base/     # Base UI components
+│   │   │   └── ...       # Feature components
+│   │   ├── views/        # Page components
+│   │   │   ├── auth/     # Authentication pages
+│   │   │   ├── dashboard/# Dashboard pages
+│   │   │   └── ...       # Other pages
+│   │   ├── router/       # Vue Router configuration
+│   │   ├── sass/         # Styling with SASS
+│   │   ├── locales/      # Internationalization
+│   │   └── main.js       # Application entry point
+│   ├── Dockerfile        # Production Docker image
+│   ├── .dockerignore     # Docker build exclusions
+│   ├── env.example       # Environment template
+│   └── README.md         # Frontend documentation
+└── docs/                 # Additional documentation
+    ├── DOCKER_SETUP_DOCUMENTATION.md
+    └── QUICK_START_GUIDE.md
+```
+
+## 🔧 Working with Submodules
+
+### Understanding Submodules
+This repository uses Git submodules to manage the backend and frontend as separate repositories while maintaining them in a unified project structure.
+
+### Submodule Commands
+
+#### Check Submodule Status
 ```bash
-# Start database services
-yarn dep:up
+git submodule status
 ```
 
-#### Run Backend in Development Mode
+#### Update Submodules
 ```bash
-# Install dependencies
-yarn install
+# Update all submodules to latest commits
+git submodule update --remote
 
-# Start development server
-yarn dev
+# Update specific submodules
+git submodule update --remote backend
+git submodule update --remote frontend
 ```
 
-#### Stop Core Services
+#### Work on Individual Submodules
 ```bash
-yarn dep:down
+# Work on backend
+cd backend
+git checkout development
+git pull origin development
+
+# Work on frontend
+cd ../frontend
+git checkout development
+git pull origin development
 ```
 
-## 📋 API Documentation
+#### Commit Submodule Changes
+```bash
+# After making changes in submodules
+cd backend
+git add .
+git commit -m "feat: add new feature"
+git push origin development
 
-- **Health Check**: `GET http://localhost:9001/health`
-- **Swagger Docs**: `GET http://localhost:9001/api/docs`
-- **API Base URL**: `http://localhost:9001/api`
+cd ../frontend
+git add .
+git commit -m "feat: update UI"
+git push origin development
 
-## 🔧 Configuration
-
-### Environment Variables
-
-Create `.env.docker` file with the following variables:
-
-```env
-# Database Configuration
-DATABASE_URL=postgresql://admin:master123@postgres:5432/postgres
-
-# Message Queue Configuration
-RABBITMQ_URL=amqp://admin:master123@rabbitmq:5672
-
-# Cache Configuration
-REDIS_URL=redis://:master123@redis:6379
-
-# JWT Configuration
-JWT_SECRET=your_jwt_secret_here
-JWT_REFRESH_SECRET=your_jwt_refresh_secret_here
-
-# AWS Configuration
-AWS_ACCESS_KEY_ID=your_aws_access_key_id_here
-AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key_here
-AWS_REGION=your_aws_region_here
-AWS_S3_BUCKET=your_s3_bucket_name_here
-
-# Application Configuration
-NODE_ENV=production
-PORT=9001
-
-# Email Configuration
-SMTP_HOST=your_smtp_host_here
-SMTP_PORT=587
-SMTP_USER=your_smtp_user_here
-SMTP_PASS=your_smtp_password_here
-
-# Other Configuration
-API_PREFIX=/api
-CORS_ORIGIN=http://localhost:9000
+# Update main repository with new submodule commits
+cd ..
+git add backend frontend
+git commit -m "chore: update submodules"
+git push origin master
 ```
-
-### Environment Files
-- **`.env.local`**: Local development environment
-- **`.env.docker`**: Docker compose environment
-- **`.env`**: Production environment
-- **`env.example`**: Template file (safe to commit)
 
 ## 🐳 Docker Configuration
 
-### Multi-Stage Build
-The Dockerfile uses a multi-stage build process:
-1. **Base**: Common setup for all stages
-2. **Deps**: Dependency installation
-3. **Builder**: Application compilation
-4. **Production**: Final lightweight image
+### Complete Stack Deployment
+```bash
+# Start all services
+docker-compose up --build
 
-### Security Features
-- ✅ Non-root user execution (`nestjs` user)
-- ✅ Alpine Linux base image
-- ✅ Proper file permissions
-- ✅ Signal handling with `dumb-init`
-- ✅ Health checks
+# Run in background
+docker-compose up --build -d
 
-### Performance Optimizations
-- ✅ Layer caching for faster builds
-- ✅ Production-only dependencies
-- ✅ Frozen lockfile for reproducible builds
-- ✅ Cache cleaning
+# View logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down
+```
+
+### Individual Service Management
+```bash
+# Backend only
+cd backend
+docker build -t backend-app .
+docker run -p 9001:9001 backend-app
+
+# Frontend only
+cd frontend
+docker build -t frontend-app .
+docker run -p 9000:9000 frontend-app
+```
 
 ## 📊 Monitoring & Health Checks
 
-### Health Endpoints
-- **Application Health**: `GET /health`
-- **Database**: `docker exec md-postgres pg_isready`
-- **Redis**: `docker exec md-redis redis-cli ping`
-- **RabbitMQ**: `docker exec md-rabbitmq rabbitmq-diagnostics ping`
+### Service Endpoints
+- **Frontend**: http://localhost:9000
+- **Backend Health**: http://localhost:9001/health
+- **Backend API Docs**: http://localhost:9001/api/docs
+- **RabbitMQ Management**: http://localhost:15672 (admin/master123)
 
-### Logging
-- Structured JSON logging
-- Error tracking and reporting
-- Performance monitoring
+### Health Check Commands
+```bash
+# Application health
+curl http://localhost:9001/health
 
-## 🔒 Security Considerations
+# Database health
+docker exec md-postgres pg_isready
+
+# Redis health
+docker exec md-redis redis-cli ping
+
+# RabbitMQ health
+docker exec md-rabbitmq rabbitmq-diagnostics ping
+```
+
+## 🔒 Security Features
 
 ### Implemented Security Measures
-- Non-root container execution
-- Minimal attack surface (Alpine Linux)
-- Proper file ownership and permissions
-- Graceful signal handling
-- Health monitoring
+- ✅ Non-root container execution
+- ✅ Alpine Linux base images
+- ✅ Proper file permissions
+- ✅ Environment variable protection
+- ✅ Health monitoring
+- ✅ Input validation and sanitization
 
 ### Best Practices
 - Never commit `.env.docker` files to Git
@@ -160,75 +248,75 @@ The Dockerfile uses a multi-stage build process:
 - Regular security updates
 - Image vulnerability scanning
 
-## 🚀 Production Deployment
+## 🚀 Development Workflow
 
-### Docker Compose (Recommended)
+### Local Development
 ```bash
-# Production deployment
-docker-compose up --build -d
+# Start core services
+yarn dep:up
 
-# View logs
-docker-compose logs -f backend
-
-# Scale services
-docker-compose up --scale backend=3
-```
-
-### Kubernetes Ready
-The application is ready for Kubernetes deployment with:
-- Health checks
-- Proper signal handling
-- Non-root execution
-- Resource limits support
-
-## 🛠️ Development Commands
-
-```bash
-# Install dependencies
+# Backend development
+cd backend
 yarn install
-
-# Development server
 yarn dev
 
-# Build application
-yarn build
-
-# Run tests
-yarn test
-yarn test:e2e
-
-# Linting
-yarn lint
-yarn lint:fix
-
-# Database migrations
-yarn migrate
-yarn migrate:prod
-
-# Seed database
-yarn seed
+# Frontend development
+cd frontend
+yarn install
+yarn dev
 ```
 
-## 🔗 Related Services
+### Production Deployment
+```bash
+# Build and deploy
+docker-compose up --build -d
 
-- **Frontend**: Vue.js application (port 9000)
-- **Backend**: Nest.Js application (port 9001)
-- **Database**: PostgreSQL (port 5432)
-- **Message Queue**: RabbitMQ (ports 5672, 15672)
-- **Cache**: Redis (port 6379)
+# Scale services
+docker-compose up --scale backend=3 --scale frontend=2
+```
 
-## 📚 Additional Documentation
+## 📚 Documentation
 
-- **Docker Setup**: See `DOCKER_SETUP_DOCUMENTATION.md`
-- **Quick Start**: See `QUICK_START_GUIDE.md`
-- **API Documentation**: Available at `/api/docs` when running
+### Project Documentation
+- **Backend Documentation**: See `backend/README.md`
+- **Frontend Documentation**: See `frontend/README.md`
+- **Docker Setup**: See `docs/DOCKER_SETUP_DOCUMENTATION.md`
+- **Quick Start**: See `docs/QUICK_START_GUIDE.md`
+
+### API Documentation
+- **Swagger UI**: Available at http://localhost:9001/api/docs when running
+- **Health Check**: http://localhost:9001/health
 
 ## 🤝 Contributing
 
-1. Follow the existing code style
-2. Add tests for new features
-3. Update documentation as needed
-4. Ensure all tests pass before submitting
+### Development Guidelines
+1. **Submodule Workflow**: Make changes in individual submodules
+2. **Testing**: Ensure all tests pass before committing
+3. **Documentation**: Update relevant documentation
+4. **Security**: Follow security best practices
+
+### Pull Request Process
+1. Create feature branch in appropriate submodule
+2. Make changes and test thoroughly
+3. Push changes to submodule repository
+4. Update main repository with new submodule commits
+5. Create pull request for main repository
+
+## 🔄 Version Management
+
+### Submodule Version Control
+```bash
+# Check current submodule versions
+git submodule status
+
+# Update to specific versions
+git submodule update --remote backend
+git submodule update --remote frontend
+
+# Lock submodule versions
+git add backend frontend
+git commit -m "chore: update submodule versions"
+```
 
 ## 📄 License
 
@@ -236,6 +324,9 @@ This project is proprietary and confidential.
 
 ---
 
+**Repository**: https://github.com/Nojorono/md-hub  
+**Backend**: https://github.com/Nojorono/backend-md  
+**Frontend**: https://github.com/Nojorono/frontend-md-dashboard  
 **Last Updated**: [Current Date]  
 **Version**: 2.1.0
 
