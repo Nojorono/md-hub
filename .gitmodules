@@ -2,7 +2,7 @@
 	path = frontend
 	url = https://github.com/Nojorono/frontend-md-dashboard.git
 	branch = master
-[submodule backend]
+[submodule "backend"]
 	path = backend
 	url = https://github.com/Nojorono/backend-md.git
 	branch = main
